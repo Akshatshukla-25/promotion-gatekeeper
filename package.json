@@ -1,0 +1,14 @@
+{
+  "name": "promotion-gatekeeper",
+  "version": "1.0.0",
+  "description": "GitHub Action: sticky PR comment, commit status and cross-environment ledger for dev/uat/prod promotions.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "coverage": "node --test --experimental-test-coverage \"test/*.test.js\"",
+    "demo": "node scripts/demo.js"
+  }
+}

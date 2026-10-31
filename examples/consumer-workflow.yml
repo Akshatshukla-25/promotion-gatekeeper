@@ -1,0 +1,37 @@
+# Copy to .github/workflows/promotion-gatekeeper.yml in the repo you want to protect.
+# The file must exist on EVERY environment branch and on the default branch
+# (workflow_run workflows only run from the default branch).
+name: Promotion Gatekeeper
+on:
+  pull_request:
+    branches: [uat, prod]
+  workflow_run:
+    workflows: ["CI"]          # name of your existing CI workflow
+    types: [completed]
+concurrency:
+  group: gatekeeper-${{ github.event.pull_request.number || github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  checks: read
+  pull-requests: write
+  statuses: write
+jobs:
+  gatekeeper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0       # required: the analysis reads full branch history
+      - uses: OWNER/promotion-gatekeeper@v1
+        with:
+          environments: dev,uat,prod
+          block-on-blocked: "false"   # start advisory; switch to "true" once you trust it
+          # required-checks: build,test
+          # ignore-checks: lint
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: promotion-gatekeeper-report
+          path: promotion-gatekeeper-report/
+          if-no-files-found: ignore

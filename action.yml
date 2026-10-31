@@ -1,0 +1,32 @@
+name: Promotion Gatekeeper
+description: Sticky PR comment, commit status and cross-environment ledger for promotions between environment branches.
+author: promotion-gatekeeper
+inputs:
+  github-token:
+    description: Token used to read checks and write the PR comment and commit status.
+    default: ${{ github.token }}
+  environments:
+    description: Comma-separated environment branches, lowest to highest.
+    default: dev,uat,prod
+  block-on-blocked:
+    description: If "true", a Blocked verdict sets the commit status to failure. Otherwise it is advisory (success).
+    default: "false"
+  required-checks:
+    description: Comma-separated check-run names / status contexts that define "tested". Empty = any check counts.
+    default: ""
+  ignore-checks:
+    description: Comma-separated check-run names / status contexts to ignore (promotion-gatekeeper is always ignored).
+    default: ""
+  report-dir:
+    description: Directory (relative to the workspace) for report.html, report.json and ledger.md.
+    default: promotion-gatekeeper-report
+outputs:
+  verdict:
+    description: Empty, Blocked, Caution or Ready.
+  report:
+    description: Compact one-line JSON summary (verdict, reasons, counts, conflict files, next hop).
+  report-path:
+    description: Directory holding the full report.json, ledger.md and report.html.
+runs:
+  using: node24
+  main: src/index.js
